@@ -55,6 +55,22 @@ const RELICS: Dictionary = {
 		"name": "Ring of the Snake", "color": Color(0.4, 0.8, 0.5), "starter": true,
 		"text": "Draw 2 additional cards on your first turn of each combat.",
 	},
+	"cracked_core": {
+		"name": "Cracked Core", "color": Color(0.3, 0.85, 0.85), "starter": true,
+		"text": "At the start of each combat, Channel 1 Lightning.",
+	},
+	"pure_water": {
+		"name": "Pure Water", "color": Color(0.75, 0.55, 0.95), "starter": true,
+		"text": "At the start of each combat, add a Miracle to your hand.",
+	},
+	"calipers": {
+		"name": "Calipers", "color": Color(0.6, 0.65, 0.7),
+		"text": "At the start of your turn, lose 15 Block instead of all of it.",
+	},
+	"ice_cream": {
+		"name": "Ice Cream", "color": Color(0.9, 0.8, 0.95),
+		"text": "Unused Energy carries over between turns.",
+	},
 	# ------------------------------------------------------ boss relics ----
 	"fusion_hammer": {
 		"name": "Fusion Hammer", "color": Color(0.9, 0.6, 0.2), "boss": true, "energy": true,

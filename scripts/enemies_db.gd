@@ -282,9 +282,16 @@ static func choose_intent(e: Dictionary, rng: RandomNumberGenerator) -> Dictiona
 				return {"label": "Swoop", "dmg": 12}
 			return {"label": "Caw", "strength": 1}
 		"mugger":
-			if (e.turn % 3) < 2:
-				return {"label": "Mug", "dmg": 10, "steal_gold": 15}
-			return {"label": "Lunge", "dmg": 16}
+			# Mugs twice, lunges, covers itself, then escapes with your gold.
+			match e.turn:
+				0, 1:
+					return {"label": "Mug", "dmg": 10, "steal_gold": 15}
+				2:
+					return {"label": "Lunge", "dmg": 16}
+				3:
+					return {"label": "Smoke Bomb", "block": 11}
+				_:
+					return {"label": "Escape", "escape": true}
 		"shelled_parasite":
 			var r := rng.randf()
 			if r < 0.4:
@@ -386,13 +393,19 @@ static func choose_intent(e: Dictionary, rng: RandomNumberGenerator) -> Dictiona
 			e.extra.time += 1
 			return {"label": "It Is Time", "dmg": 26 + 4 * (e.extra.time - 1)}
 		"nemesis":
+			# Phases in and out of reality: Intangible every other turn.
+			var intent: Dictionary
 			match e.turn % 3:
 				0:
-					return {"label": "Attack", "dmg": 6, "hits": 3}
+					intent = {"label": "Attack", "dmg": 6, "hits": 3}
 				1:
-					return {"label": "Debuff", "add_card": {"id": "burn", "count": 3}}
+					intent = {"label": "Debuff", "add_card": {"id": "burn", "count": 3}}
 				_:
-					return {"label": "Scythe", "dmg": 32}
+					intent = {"label": "Scythe", "dmg": 32}
+			if e.turn % 2 == 0:
+				intent["intangible"] = 1
+				intent["label"] = String(intent.label) + " (Intangible)"
+			return intent
 		"awakened_one":
 			if e.extra.revive.used:
 				match e.turn % 3:

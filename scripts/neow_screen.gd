@@ -23,7 +23,7 @@ func _on_relic_pressed() -> void:
 func _on_remove_pressed() -> void:
 	var picker := CARD_PICKER.instantiate()
 	add_child(picker)
-	picker.open(Run.deck, "Choose a card to remove", true)
+	picker.open(Run.deck, "Choose a card to remove", true, CardsDB.removable)
 	picker.picked.connect(func(idx: int) -> void:
 		Run.deck.remove_at(idx)
 		_done())

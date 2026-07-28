@@ -5,8 +5,12 @@ class_name CardsDB
 ## exhaust, unplayable, x_cost, strength_mult, damage_from_block, double_block,
 ## rampage (also negative), armaments, feel_no_pain, dark_embrace, ethereal,
 ## end_turn_damage, poison, dexterity, next_turn_block, add_shivs,
-## discard_random, poison_mult, thousand_cuts, after_image.
-## "char": "ironclad" / "silent" / "any" (statuses, curses, shared starters).
+## discard_choose, poison_mult, thousand_cuts, after_image, retain, barricade,
+## channel_lightning/frost/dark, dualcast, multi_cast, focus, orb_slots,
+## electrodynamics, artifact, next_turn_energy, enter_stance, exit_stance,
+## mantra, wrath_block, inner_peace, calm_if_attacking, shuffle_to_draw,
+## draw_to_full, mental_fortress, rushdown, devotion, unremovable.
+## "char": "ironclad" / "silent" / "defect" / "watcher" / "any".
 
 const CARDS: Dictionary = {
 	# ---------------------------------------------------------- shared ----
@@ -203,8 +207,8 @@ const CARDS: Dictionary = {
 	},
 	"survivor": {
 		"name": "Survivor", "type": "skill", "rarity": "starter", "cost": 1, "target": "self", "char": "silent",
-		"block": 8, "discard_random": 1, "text": "Gain 8 Block. Discard a card at random.",
-		"up": {"block": 11, "text": "Gain 11 Block. Discard a card at random."},
+		"block": 8, "discard_choose": 1, "text": "Gain 8 Block. Discard a card.",
+		"up": {"block": 11, "text": "Gain 11 Block. Discard a card."},
 	},
 	"shiv": {
 		"name": "Shiv", "type": "attack", "rarity": "special", "cost": 0, "target": "enemy", "char": "silent",
@@ -218,9 +222,9 @@ const CARDS: Dictionary = {
 	},
 	"dagger_throw": {
 		"name": "Dagger Throw", "type": "attack", "rarity": "common", "cost": 1, "target": "enemy", "char": "silent",
-		"damage": 9, "draw": 1, "discard_random": 1,
-		"text": "Deal 9 damage. Draw 1 card. Discard a card at random.",
-		"up": {"damage": 12, "text": "Deal 12 damage. Draw 1 card. Discard a card at random."},
+		"damage": 9, "draw": 1, "discard_choose": 1,
+		"text": "Deal 9 damage. Draw 1 card. Discard a card.",
+		"up": {"damage": 12, "text": "Deal 12 damage. Draw 1 card. Discard a card."},
 	},
 	"slice": {
 		"name": "Slice", "type": "attack", "rarity": "common", "cost": 0, "target": "enemy", "char": "silent",
@@ -254,8 +258,8 @@ const CARDS: Dictionary = {
 	},
 	"acrobatics": {
 		"name": "Acrobatics", "type": "skill", "rarity": "common", "cost": 1, "target": "self", "char": "silent",
-		"draw": 3, "discard_random": 1, "text": "Draw 3 cards. Discard a card at random.",
-		"up": {"draw": 4, "text": "Draw 4 cards. Discard a card at random."},
+		"draw": 3, "discard_choose": 1, "text": "Draw 3 cards. Discard a card.",
+		"up": {"draw": 4, "text": "Draw 4 cards. Discard a card."},
 	},
 	"leg_sweep": {
 		"name": "Leg Sweep", "type": "skill", "rarity": "uncommon", "cost": 2, "target": "enemy", "char": "silent",
@@ -313,6 +317,208 @@ const CARDS: Dictionary = {
 		"after_image": 1, "text": "Whenever you play a card, gain 1 Block.",
 		"up": {"after_image": 2, "text": "Whenever you play a card, gain 2 Block."},
 	},
+	"barricade": {
+		"name": "Barricade", "type": "power", "rarity": "rare", "cost": 3, "target": "self", "char": "ironclad",
+		"barricade": true, "text": "Your Block is no longer removed at the start of your turn.",
+		"up": {"cost": 2, "text": "Your Block is no longer removed at the start of your turn."},
+	},
+	# ---------------------------------------------------------- defect ----
+	"zap": {
+		"name": "Zap", "type": "skill", "rarity": "starter", "cost": 1, "target": "self", "char": "defect",
+		"channel_lightning": 1, "text": "Channel 1 Lightning.",
+		"up": {"cost": 0, "text": "Channel 1 Lightning."},
+	},
+	"dualcast": {
+		"name": "Dualcast", "type": "skill", "rarity": "starter", "cost": 1, "target": "self", "char": "defect",
+		"dualcast": true, "text": "Evoke your next Orb twice.",
+		"up": {"cost": 0, "text": "Evoke your next Orb twice."},
+	},
+	"ball_lightning": {
+		"name": "Ball Lightning", "type": "attack", "rarity": "common", "cost": 1, "target": "enemy", "char": "defect",
+		"damage": 7, "channel_lightning": 1, "text": "Deal 7 damage. Channel 1 Lightning.",
+		"up": {"damage": 10, "text": "Deal 10 damage. Channel 1 Lightning."},
+	},
+	"cold_snap": {
+		"name": "Cold Snap", "type": "attack", "rarity": "common", "cost": 1, "target": "enemy", "char": "defect",
+		"damage": 6, "channel_frost": 1, "text": "Deal 6 damage. Channel 1 Frost.",
+		"up": {"damage": 9, "text": "Deal 9 damage. Channel 1 Frost."},
+	},
+	"coolheaded": {
+		"name": "Coolheaded", "type": "skill", "rarity": "common", "cost": 1, "target": "self", "char": "defect",
+		"channel_frost": 1, "draw": 1, "text": "Channel 1 Frost. Draw 1 card.",
+		"up": {"draw": 2, "text": "Channel 1 Frost. Draw 2 cards."},
+	},
+	"claw": {
+		"name": "Claw", "type": "attack", "rarity": "common", "cost": 0, "target": "enemy", "char": "defect",
+		"damage": 3, "rampage": 2,
+		"text": "Deal 3 damage. Its damage rises by 2 each time it is played this combat.",
+		"up": {"damage": 5, "text": "Deal 5 damage. Its damage rises by 2 each time it is played this combat."},
+	},
+	"sweeping_beam": {
+		"name": "Sweeping Beam", "type": "attack", "rarity": "common", "cost": 1, "target": "all", "char": "defect",
+		"damage": 6, "draw": 1, "text": "Deal 6 damage to ALL enemies. Draw 1 card.",
+		"up": {"damage": 9, "text": "Deal 9 damage to ALL enemies. Draw 1 card."},
+	},
+	"charge_battery": {
+		"name": "Charge Battery", "type": "skill", "rarity": "common", "cost": 1, "target": "self", "char": "defect",
+		"block": 7, "next_turn_energy": 1, "text": "Gain 7 Block. Next turn, gain 1 extra Energy.",
+		"up": {"block": 10, "text": "Gain 10 Block. Next turn, gain 1 extra Energy."},
+	},
+	"compile_driver": {
+		"name": "Compile Driver", "type": "attack", "rarity": "common", "cost": 1, "target": "enemy", "char": "defect",
+		"damage": 7, "draw": 1, "text": "Deal 7 damage. Draw 1 card.",
+		"up": {"damage": 10, "text": "Deal 10 damage. Draw 1 card."},
+	},
+	"doom_and_gloom": {
+		"name": "Doom and Gloom", "type": "attack", "rarity": "uncommon", "cost": 2, "target": "all", "char": "defect",
+		"damage": 10, "channel_dark": 1, "text": "Deal 10 damage to ALL enemies. Channel 1 Dark.",
+		"up": {"damage": 14, "text": "Deal 14 damage to ALL enemies. Channel 1 Dark."},
+	},
+	"defragment": {
+		"name": "Defragment", "type": "power", "rarity": "uncommon", "cost": 1, "target": "self", "char": "defect",
+		"focus": 1, "text": "Gain 1 Focus. (Focus boosts your Orbs.)",
+		"up": {"focus": 2, "text": "Gain 2 Focus. (Focus boosts your Orbs.)"},
+	},
+	"glacier": {
+		"name": "Glacier", "type": "skill", "rarity": "uncommon", "cost": 2, "target": "self", "char": "defect",
+		"block": 7, "channel_frost": 2, "text": "Gain 7 Block. Channel 2 Frost.",
+		"up": {"block": 10, "text": "Gain 10 Block. Channel 2 Frost."},
+	},
+	"capacitor": {
+		"name": "Capacitor", "type": "power", "rarity": "uncommon", "cost": 1, "target": "self", "char": "defect",
+		"orb_slots": 2, "text": "Gain 2 Orb slots.",
+		"up": {"orb_slots": 3, "text": "Gain 3 Orb slots."},
+	},
+	"consume": {
+		"name": "Consume", "type": "skill", "rarity": "uncommon", "cost": 2, "target": "self", "char": "defect",
+		"focus": 2, "orb_slots": -1, "text": "Gain 2 Focus. Lose 1 Orb slot.",
+		"up": {"focus": 3, "text": "Gain 3 Focus. Lose 1 Orb slot."},
+	},
+	"electrodynamics": {
+		"name": "Electrodynamics", "type": "power", "rarity": "rare", "cost": 2, "target": "self", "char": "defect",
+		"electrodynamics": true, "channel_lightning": 2,
+		"text": "Lightning now hits ALL enemies. Channel 2 Lightning.",
+		"up": {"channel_lightning": 3, "text": "Lightning now hits ALL enemies. Channel 3 Lightning."},
+	},
+	"multi_cast": {
+		"name": "Multi-Cast", "type": "skill", "rarity": "rare", "cost": 0, "target": "self", "char": "defect",
+		"x_cost": true, "multi_cast": true, "text": "Evoke your next Orb X times. (X = all your Energy)",
+		"up": {"multi_cast_bonus": 1, "text": "Evoke your next Orb X+1 times. (X = all your Energy)"},
+	},
+	"hyperbeam": {
+		"name": "Hyperbeam", "type": "attack", "rarity": "rare", "cost": 2, "target": "all", "char": "defect",
+		"damage": 26, "focus": -3, "text": "Deal 26 damage to ALL enemies. Lose 3 Focus.",
+		"up": {"damage": 34, "text": "Deal 34 damage to ALL enemies. Lose 3 Focus."},
+	},
+	"core_surge": {
+		"name": "Core Surge", "type": "attack", "rarity": "rare", "cost": 1, "target": "enemy", "char": "defect",
+		"damage": 11, "artifact": 1, "exhaust": true,
+		"text": "Deal 11 damage. Gain 1 Artifact (negates a debuff). Exhaust.",
+		"up": {"damage": 15, "text": "Deal 15 damage. Gain 1 Artifact (negates a debuff). Exhaust."},
+	},
+	# --------------------------------------------------------- watcher ----
+	"eruption": {
+		"name": "Eruption", "type": "attack", "rarity": "starter", "cost": 2, "target": "enemy", "char": "watcher",
+		"damage": 9, "enter_stance": "wrath", "text": "Deal 9 damage. Enter Wrath.",
+		"up": {"cost": 1, "text": "Deal 9 damage. Enter Wrath."},
+	},
+	"vigilance": {
+		"name": "Vigilance", "type": "skill", "rarity": "starter", "cost": 2, "target": "self", "char": "watcher",
+		"block": 8, "enter_stance": "calm", "text": "Gain 8 Block. Enter Calm.",
+		"up": {"block": 12, "text": "Gain 12 Block. Enter Calm."},
+	},
+	"miracle": {
+		"name": "Miracle", "type": "skill", "rarity": "special", "cost": 0, "target": "self", "char": "watcher",
+		"energy": 1, "retain": true, "exhaust": true, "text": "Gain 1 Energy. Retain. Exhaust.",
+		"up": {"energy": 2, "text": "Gain 2 Energy. Retain. Exhaust."},
+	},
+	"crush_joints": {
+		"name": "Crush Joints", "type": "attack", "rarity": "common", "cost": 1, "target": "enemy", "char": "watcher",
+		"damage": 8, "vulnerable": 1, "text": "Deal 8 damage. Apply 1 Vulnerable.",
+		"up": {"damage": 10, "vulnerable": 2, "text": "Deal 10 damage. Apply 2 Vulnerable."},
+	},
+	"empty_fist": {
+		"name": "Empty Fist", "type": "attack", "rarity": "common", "cost": 1, "target": "enemy", "char": "watcher",
+		"damage": 9, "exit_stance": true, "text": "Deal 9 damage. Exit your Stance.",
+		"up": {"damage": 14, "text": "Deal 14 damage. Exit your Stance."},
+	},
+	"empty_body": {
+		"name": "Empty Body", "type": "skill", "rarity": "common", "cost": 1, "target": "self", "char": "watcher",
+		"block": 7, "exit_stance": true, "text": "Gain 7 Block. Exit your Stance.",
+		"up": {"block": 10, "text": "Gain 10 Block. Exit your Stance."},
+	},
+	"flurry_of_blows": {
+		"name": "Flurry of Blows", "type": "attack", "rarity": "common", "cost": 0, "target": "enemy", "char": "watcher",
+		"damage": 4, "text": "Deal 4 damage.",
+		"up": {"damage": 6, "text": "Deal 6 damage."},
+	},
+	"prostrate": {
+		"name": "Prostrate", "type": "skill", "rarity": "common", "cost": 0, "target": "self", "char": "watcher",
+		"mantra": 2, "block": 4, "text": "Gain 2 Mantra. Gain 4 Block. (10 Mantra: enter Divinity.)",
+		"up": {"mantra": 3, "text": "Gain 3 Mantra. Gain 4 Block. (10 Mantra: enter Divinity.)"},
+	},
+	"protect": {
+		"name": "Protect", "type": "skill", "rarity": "common", "cost": 2, "target": "self", "char": "watcher",
+		"block": 12, "retain": true, "text": "Gain 12 Block. Retain.",
+		"up": {"block": 16, "text": "Gain 16 Block. Retain."},
+	},
+	"tranquility": {
+		"name": "Tranquility", "type": "skill", "rarity": "common", "cost": 1, "target": "self", "char": "watcher",
+		"enter_stance": "calm", "retain": true, "exhaust": true, "text": "Enter Calm. Retain. Exhaust.",
+		"up": {"cost": 0, "text": "Enter Calm. Retain. Exhaust."},
+	},
+	"crescendo": {
+		"name": "Crescendo", "type": "skill", "rarity": "common", "cost": 1, "target": "self", "char": "watcher",
+		"enter_stance": "wrath", "retain": true, "exhaust": true, "text": "Enter Wrath. Retain. Exhaust.",
+		"up": {"cost": 0, "text": "Enter Wrath. Retain. Exhaust."},
+	},
+	"halt": {
+		"name": "Halt", "type": "skill", "rarity": "common", "cost": 0, "target": "self", "char": "watcher",
+		"block": 3, "wrath_block": 9, "text": "Gain 3 Block. If you are in Wrath, gain 9 more.",
+		"up": {"block": 4, "wrath_block": 14, "text": "Gain 4 Block. If you are in Wrath, gain 14 more."},
+	},
+	"tantrum": {
+		"name": "Tantrum", "type": "attack", "rarity": "uncommon", "cost": 1, "target": "enemy", "char": "watcher",
+		"damage": 3, "hits": 3, "enter_stance": "wrath", "shuffle_to_draw": true,
+		"text": "Deal 3 damage 3 times. Enter Wrath. Shuffle this card into your draw pile.",
+		"up": {"hits": 4, "text": "Deal 3 damage 4 times. Enter Wrath. Shuffle this card into your draw pile."},
+	},
+	"inner_peace": {
+		"name": "Inner Peace", "type": "skill", "rarity": "uncommon", "cost": 1, "target": "self", "char": "watcher",
+		"inner_peace": 3, "text": "If you are in Calm, draw 3 cards. Otherwise, enter Calm.",
+		"up": {"inner_peace": 4, "text": "If you are in Calm, draw 4 cards. Otherwise, enter Calm."},
+	},
+	"fear_no_evil": {
+		"name": "Fear No Evil", "type": "attack", "rarity": "uncommon", "cost": 1, "target": "enemy", "char": "watcher",
+		"damage": 8, "calm_if_attacking": true,
+		"text": "Deal 8 damage. If the enemy intends to attack, enter Calm.",
+		"up": {"damage": 11, "text": "Deal 11 damage. If the enemy intends to attack, enter Calm."},
+	},
+	"mental_fortress": {
+		"name": "Mental Fortress", "type": "power", "rarity": "uncommon", "cost": 1, "target": "self", "char": "watcher",
+		"mental_fortress": 4, "text": "Whenever you change Stances, gain 4 Block.",
+		"up": {"mental_fortress": 6, "text": "Whenever you change Stances, gain 6 Block."},
+	},
+	"rushdown": {
+		"name": "Rushdown", "type": "power", "rarity": "uncommon", "cost": 1, "target": "self", "char": "watcher",
+		"rushdown": 2, "text": "Whenever you enter Wrath, draw 2 cards.",
+		"up": {"cost": 0, "text": "Whenever you enter Wrath, draw 2 cards."},
+	},
+	"devotion": {
+		"name": "Devotion", "type": "power", "rarity": "rare", "cost": 1, "target": "self", "char": "watcher",
+		"devotion": 2, "text": "At the start of each turn, gain 2 Mantra.",
+		"up": {"devotion": 3, "text": "At the start of each turn, gain 3 Mantra."},
+	},
+	"ragnarok": {
+		"name": "Ragnarok", "type": "attack", "rarity": "rare", "cost": 3, "target": "enemy", "char": "watcher",
+		"damage": 5, "hits": 5, "text": "Deal 5 damage 5 times.",
+		"up": {"damage": 6, "hits": 6, "text": "Deal 6 damage 6 times."},
+	},
+	"scrawl": {
+		"name": "Scrawl", "type": "skill", "rarity": "rare", "cost": 1, "target": "self", "char": "watcher",
+		"draw_to_full": true, "exhaust": true, "text": "Draw cards until your hand is full. Exhaust.",
+		"up": {"cost": 0, "text": "Draw cards until your hand is full. Exhaust."},
+	},
 	# -------------------------------------------------- status & curse ----
 	"slimed": {
 		"name": "Slimed", "type": "status", "rarity": "status", "cost": 1, "target": "self", "char": "any",
@@ -340,6 +546,12 @@ const CARDS: Dictionary = {
 		"unplayable": true, "text": "Unplayable. A permanent wound.",
 		"up": {},
 	},
+	"ascenders_bane": {
+		"name": "Ascender's Bane", "type": "curse", "rarity": "curse", "cost": 0, "target": "self", "char": "any",
+		"unplayable": true, "ethereal": true, "unremovable": true,
+		"text": "Unplayable. Ethereal. Cannot be removed from your deck.",
+		"up": {},
+	},
 }
 
 static func get_def(entry: Dictionary) -> Dictionary:
@@ -353,6 +565,9 @@ static func get_def(entry: Dictionary) -> Dictionary:
 	else:
 		def["display_name"] = base.name
 	return def
+
+static func removable(entry: Dictionary) -> bool:
+	return not CARDS[entry.id].get("unremovable", false)
 
 static func can_upgrade(entry: Dictionary) -> bool:
 	return not entry.get("up", false) and not CARDS[entry.id].up.is_empty()

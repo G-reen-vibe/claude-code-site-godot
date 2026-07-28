@@ -63,6 +63,27 @@ alignment = 1
 
 [node name="Hud" parent="." instance=ExtResource("2")]
 
+[node name="OrbRow" type="HBoxContainer" parent="."]
+visible = false
+offset_left = 62.0
+offset_top = 54.0
+offset_right = 420.0
+offset_bottom = 92.0
+theme_override_constants/separation = 6
+
+[node name="StanceLabel" type="Label" parent="."]
+visible = false
+offset_left = 40.0
+offset_top = 60.0
+offset_right = 320.0
+offset_bottom = 88.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+text = "Stance: None"
+mouse_filter = 2
+
 [node name="Prompt" type="Label" parent="."]
 offset_left = 240.0
 offset_top = 428.0

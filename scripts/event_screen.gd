@@ -64,6 +64,31 @@ func _ready() -> void:
 				{"label": "Open the box (random relic, gain an Injury curse)", "fn": _fish_relic},
 			],
 		},
+		{
+			"title": "The Cleric",
+			"desc": "A strange, floating cleric hums to itself. \"Hmm hm hmmm. Welcome to my shop, friend!\"",
+			"choices": [
+				{"label": "Heal (pay 35 Gold, heal 25% of Max HP)", "fn": _cleric_heal},
+				{"label": "Purify (pay 50 Gold, remove a card)", "fn": _cleric_purify},
+				{"label": "Leave", "fn": _leave},
+			],
+		},
+		{
+			"title": "The Duplicator",
+			"desc": "A towering shrine flanked by two identical statues. It thrums with copying magic.",
+			"choices": [
+				{"label": "Pray (duplicate a card in your deck)", "fn": _duplicate},
+				{"label": "Leave", "fn": _leave},
+			],
+		},
+		{
+			"title": "The Lab",
+			"desc": "An abandoned alchemy lab. Bubbling flasks line the shelves, free for the taking.",
+			"choices": [
+				{"label": "Search (gain 2 random potions)", "fn": _lab},
+				{"label": "Leave", "fn": _leave},
+			],
+		},
 	]
 	event = events[Run.rng.randi_range(0, events.size() - 1)]
 	$Panel/V/Title.text = event.title
@@ -141,7 +166,43 @@ func _fish_relic() -> void:
 		Run.gold += 75
 		_finish("Inside: 75 gold! But the lid slams on your fingers. (Injury added to your deck)")
 
-func _pick_card(title: String, on_pick: Callable, filter: Callable = Callable()) -> void:
+func _cleric_heal() -> void:
+	if Run.gold < 35:
+		_finish("You cannot afford the cleric's services.")
+		return
+	Run.gold -= 35
+	Run.heal(int(Run.max_hp * 0.25))
+	_finish("The cleric's chant knits your wounds. You heal %d HP." % int(Run.max_hp * 0.25))
+
+func _cleric_purify() -> void:
+	if Run.gold < 50:
+		_finish("You cannot afford the cleric's services.")
+		return
+	_pick_card("Choose a card to purify", func(idx: int) -> void:
+		Run.gold -= 50
+		var card_name: String = CardsDB.get_def(Run.deck[idx]).display_name
+		Run.deck.remove_at(idx)
+		_finish("The cleric burns %s from your mind." % card_name))
+
+func _duplicate() -> void:
+	_pick_card("Choose a card to duplicate", func(idx: int) -> void:
+		Run.deck.append(Run.deck[idx].duplicate())
+		_finish("The shrine hums — you now own another %s." % CardsDB.get_def(Run.deck[idx]).display_name),
+		Callable())
+
+func _lab() -> void:
+	var got: Array = []
+	for i in 2:
+		var pid := PotionsDB.random_id(Run.rng)
+		if Run.add_potion(pid):
+			got.append(PotionsDB.POTIONS[pid].name)
+	if got.is_empty():
+		Run.gold += 40
+		_finish("Your potion belt is full, so you pocket 40 gold worth of glassware instead.")
+	else:
+		_finish("You take: %s." % ", ".join(PackedStringArray(got)))
+
+func _pick_card(title: String, on_pick: Callable, filter: Callable = CardsDB.removable) -> void:
 	var picker := CARD_PICKER.instantiate()
 	add_child(picker)
 	picker.open(Run.deck, title, true, filter)

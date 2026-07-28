@@ -36,6 +36,22 @@ const POTIONS: Dictionary = {
 		"name": "Swift Potion", "color": Color(0.35, 0.8, 0.8), "target": "self",
 		"draw": 3, "text": "Draw 3 cards.",
 	},
+	"explosive": {
+		"name": "Explosive Potion", "color": Color(0.9, 0.6, 0.2), "target": "self",
+		"damage_all": 10, "text": "Deal 10 damage to ALL enemies.",
+	},
+	"dexterity": {
+		"name": "Dexterity Potion", "color": Color(0.4, 0.85, 0.55), "target": "self",
+		"dexterity": 2, "text": "Gain 2 Dexterity.",
+	},
+	"ancient": {
+		"name": "Ancient Potion", "color": Color(0.85, 0.75, 0.4), "target": "self",
+		"artifact": 1, "text": "Gain 1 Artifact (negates the next debuff).",
+	},
+	"fairy": {
+		"name": "Fairy in a Bottle", "color": Color(0.95, 0.7, 0.9), "target": "self",
+		"fairy": true, "text": "Cannot be drunk. When you would die, revive at 30% HP instead.",
+	},
 }
 
 static func random_id(rng: RandomNumberGenerator) -> String:

@@ -56,6 +56,8 @@ func _status_text() -> String:
 		parts.append("Thorns %d" % data.thorns)
 	if data.get("poison", 0) > 0:
 		parts.append("Poison %d" % data.poison)
+	if data.get("intangible", 0) > 0:
+		parts.append("Intangible")
 	return " · ".join(PackedStringArray(parts))
 
 func _refresh_intent(player_vulnerable: int) -> void:

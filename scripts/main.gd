@@ -33,7 +33,7 @@ func goto(screen: String) -> void:
 
 # ------------------------------------------------------------ test rigs ----
 
-func _autoplay_combat(combat: Node, max_turns: int = 60) -> int:
+func _autoplay_combat(combat: Node, max_turns: int = 60, block_first: bool = true) -> int:
 	## Plays any deck greedily until the fight resolves. Returns turns taken.
 	var turns := 0
 	var guard := 0
@@ -42,14 +42,25 @@ func _autoplay_combat(combat: Node, max_turns: int = 60) -> int:
 		var played := true
 		while played and is_instance_valid(combat) and not combat.combat_over:
 			played = false
+			# Resolve any modal card picker (e.g. choose-a-card-to-discard).
+			var modal := combat.get_node_or_null("CardPicker")
+			if modal:
+				modal.picked.emit(0)
+				modal.free()
+				played = true
+				continue
+			if combat.busy:
+				break
 			# Block-first greedy bot: biggest block card, then biggest attack.
 			var candidates: Array = combat.hand.duplicate()
 			candidates.sort_custom(func(a, b) -> bool:
 				var da: Dictionary = CardsDB.get_def(a.entry)
 				var db: Dictionary = CardsDB.get_def(b.entry)
-				if da.get("block", 0) != db.get("block", 0):
-					return da.get("block", 0) > db.get("block", 0)
-				return da.get("damage", 0) > db.get("damage", 0))
+				var pa: int = da.get("block", 0) if block_first else da.get("damage", 0)
+				var pb: int = db.get("block", 0) if block_first else db.get("damage", 0)
+				if pa != pb:
+					return pa > pb
+				return da.get("damage", 0) + da.get("block", 0) > db.get("damage", 0) + db.get("block", 0))
 			for c in candidates:
 				var def: Dictionary = CardsDB.get_def(c.entry)
 				if not def.get("unplayable", false) and def.cost <= combat.energy:
@@ -154,7 +165,7 @@ func _smoke_test() -> void:
 	print("[smoke] draw pile viewer open=%s" % str(pile_picker != null))
 	if pile_picker:
 		pile_picker._on_close_button_pressed()
-	var turns: int = await _autoplay_combat(combat, 40)
+	var turns: int = await _autoplay_combat(combat, 40, false)
 	print("[smoke] combat done after %d turns, hp=%d, screen=%s" % [turns, Run.hp, current.name])
 	if current.name == "Reward":
 		if Run.pending_reward.get("potion", "") != "":
@@ -200,6 +211,33 @@ func _smoke_test() -> void:
 	current._on_continue_button_pressed()
 	await get_tree().process_frame
 	print("[smoke] event resolved, back on %s" % current.name)
+	# Defect: orbs, focus, channel/evoke, ascension scaling.
+	Run.new_run("defect", 0)
+	Run.ascension = 3
+	Run.current_row = 0
+	Run.pending_node_type = "monster"
+	Run.pending_encounter = ["louse", "louse"]
+	goto("combat")
+	await get_tree().process_frame
+	var dcombat: Node = current
+	var dturns: int = await _autoplay_combat(dcombat, 40, false)
+	print("[smoke] defect combat done in %d turns, hp=%d, screen=%s" % [dturns, Run.hp, current.name])
+	if current.name == "Reward":
+		current._on_skip_button_pressed()
+		await get_tree().process_frame
+	# Watcher: stances, mantra, retain (Miracle from Pure Water).
+	Run.new_run("watcher", 0)
+	Run.current_row = 0
+	Run.pending_node_type = "monster"
+	Run.pending_encounter = ["cultist"]
+	goto("combat")
+	await get_tree().process_frame
+	var wcombat: Node = current
+	var wturns: int = await _autoplay_combat(wcombat, 40, false)
+	print("[smoke] watcher combat done in %d turns, hp=%d, screen=%s" % [wturns, Run.hp, current.name])
+	if current.name == "Reward":
+		current._on_skip_button_pressed()
+		await get_tree().process_frame
 	# Save / load round-trip.
 	Run.save_game()
 	var saved_gold := Run.gold

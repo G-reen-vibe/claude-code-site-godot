@@ -111,7 +111,7 @@ func _on_relic_button_pressed() -> void:
 func _on_remove_button_pressed() -> void:
 	var picker := CARD_PICKER.instantiate()
 	add_child(picker)
-	picker.open(Run.deck, "Pay %d gold to remove a card" % REMOVE_COST, true)
+	picker.open(Run.deck, "Pay %d gold to remove a card" % REMOVE_COST, true, CardsDB.removable)
 	picker.picked.connect(func(idx: int) -> void:
 		if Run.gold < REMOVE_COST:
 			return

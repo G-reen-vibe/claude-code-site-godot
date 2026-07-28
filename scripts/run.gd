@@ -23,11 +23,44 @@ const CHARACTERS := {
 			["strike", 5], ["defend", 5], ["neutralize", 1], ["survivor", 1],
 		],
 	},
+	"defect": {
+		"name": "The Defect", "max_hp": 75, "relic": "cracked_core",
+		"sprite": "res://assets/sprites/defect.svg",
+		"desc": "An awakened automaton. Channels Lightning, Frost and Dark orbs, amplified by Focus.",
+		"deck": [
+			["strike", 4], ["defend", 4], ["zap", 1], ["dualcast", 1],
+		],
+	},
+	"watcher": {
+		"name": "The Watcher", "max_hp": 72, "relic": "pure_water",
+		"sprite": "res://assets/sprites/watcher.svg",
+		"desc": "A blind ascetic who flows between Calm and Wrath, building Mantra toward Divinity.",
+		"deck": [
+			["strike", 4], ["defend", 4], ["eruption", 1], ["vigilance", 1],
+		],
+	},
 }
+
+const MAX_ASCENSION := 10
+const ASCENSION_INFO := [
+	"A1: Elites appear more often.",
+	"A2: Normal enemies are stronger.",
+	"A3: Elites are stronger.",
+	"A4: Bosses are stronger.",
+	"A5: Rest Sites heal less (20%).",
+	"A6: Begin each run damaged.",
+	"A7: Normal enemies have more HP.",
+	"A8: Elites have more HP.",
+	"A9: Bosses have more HP.",
+	"A10: Begin cursed with Ascender's Bane.",
+]
+
+const PROFILE_PATH := "user://profile.json"
 
 var rng := RandomNumberGenerator.new()
 
 var character := "ironclad"
+var ascension: int = 0
 var act: int = 1
 var max_hp: int = 80
 var hp: int = 80
@@ -45,27 +78,59 @@ var pending_encounter: Array = []
 var pending_node_type := "monster"
 var pending_reward: Dictionary = {}
 
+var profile: Dictionary = {"asc": {}, "wins": 0}
+
 func _ready() -> void:
 	rng.randomize()
+	load_profile()
 	new_run("ironclad")
 
-func new_run(character_id: String) -> void:
+func new_run(character_id: String, asc: int = 0) -> void:
 	character = character_id
+	ascension = asc
 	var cdef: Dictionary = CHARACTERS[character]
 	act = 1
 	max_hp = cdef.max_hp
 	hp = max_hp
+	if ascension >= 6:
+		hp = int(max_hp * 0.9)
 	gold = 99
 	victory = false
 	deck.clear()
 	for pair in cdef.deck:
 		for i in pair[1]:
 			deck.append({"id": pair[0], "up": false})
+	if ascension >= 10:
+		deck.append({"id": "ascenders_bane", "up": false})
 	relics = [cdef.relic]
 	potions = []
 	current_row = -1
 	current_col = 0
 	_generate_map()
+
+func rest_heal_pct() -> float:
+	return 0.2 if ascension >= 5 else 0.3
+
+## Extra Strength / HP multiplier applied to enemies by ascension level.
+func enemy_scaling(kind: String) -> Dictionary:
+	var s := {"strength": 0, "hp_mult": 1.0}
+	match kind:
+		"monster":
+			if ascension >= 2:
+				s.strength = 1
+			if ascension >= 7:
+				s.hp_mult = 1.1
+		"elite":
+			if ascension >= 3:
+				s.strength = 1
+			if ascension >= 8:
+				s.hp_mult = 1.1
+		"boss":
+			if ascension >= 4:
+				s.strength = 2
+			if ascension >= 9:
+				s.hp_mult = 1.1
+	return s
 
 func next_act() -> void:
 	act += 1
@@ -89,16 +154,17 @@ func _roll_type(row: int) -> String:
 		return "monster"
 	if row == MAP_ROWS - 2:
 		return "rest"
+	var elite_extra := 0.05 if ascension >= 1 else 0.0
 	var r := rng.randf()
-	if r < 0.42:
+	if r < 0.42 - elite_extra:
 		return "monster"
-	if r < 0.56:
+	if r < 0.56 - elite_extra:
 		return "event"
-	if r < 0.68:
+	if r < 0.68 + elite_extra:
 		return "elite" if row >= 4 else "monster"
-	if r < 0.78:
+	if r < 0.78 + elite_extra:
 		return "rest"
-	if r < 0.89:
+	if r < 0.89 + elite_extra / 2.0:
 		return "shop"
 	return "treasure"
 
@@ -151,12 +217,48 @@ func shuffle_array(a: Array) -> void:
 		a[i] = a[j]
 		a[j] = tmp
 
+# --------------------------------------------------------------- profile ----
+
+func load_profile() -> void:
+	if not FileAccess.file_exists(PROFILE_PATH):
+		return
+	var f := FileAccess.open(PROFILE_PATH, FileAccess.READ)
+	if f == null:
+		return
+	var data = JSON.parse_string(f.get_as_text())
+	if data is Dictionary and data.has("asc"):
+		profile = data
+
+func save_profile() -> void:
+	var f := FileAccess.open(PROFILE_PATH, FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(profile))
+
+func unlocked_ascension(character_id: String) -> int:
+	return int(profile.asc.get(character_id, 0))
+
+## Records a victory; returns the newly unlocked ascension level (or -1).
+func record_victory() -> int:
+	profile.wins = int(profile.get("wins", 0)) + 1
+	var new_unlock := -1
+	if ascension >= unlocked_ascension(character) and ascension < MAX_ASCENSION:
+		new_unlock = ascension + 1
+		profile.asc[character] = new_unlock
+	save_profile()
+	return new_unlock
+
+func score() -> int:
+	var floors := (act - 1) * MAP_ROWS + current_row + 1
+	return floors * 10 + relics.size() * 15 + int(gold / 5.0) \
+		+ ascension * 30 + (500 if victory else 0)
+
 # ------------------------------------------------------------ save/load ----
 
 func save_game() -> void:
 	var data := {
 		"version": 1,
 		"character": character,
+		"ascension": ascension,
 		"act": act,
 		"max_hp": max_hp,
 		"hp": hp,
@@ -189,6 +291,7 @@ func load_game() -> bool:
 	if not data is Dictionary or int(data.get("version", 0)) != 1:
 		return false
 	character = data.character
+	ascension = int(data.get("ascension", 0))
 	act = int(data.act)
 	max_hp = int(data.max_hp)
 	hp = int(data.hp)

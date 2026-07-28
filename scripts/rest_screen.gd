@@ -4,7 +4,7 @@ extends Control
 const CARD_PICKER := preload("res://scenes/CardPicker.tscn")
 
 func _ready() -> void:
-	$Panel/V/RestButton.text = "Rest — heal %d HP" % int(Run.max_hp * 0.3)
+	$Panel/V/RestButton.text = "Rest — heal %d HP" % int(Run.max_hp * Run.rest_heal_pct())
 	var has_upgradable := false
 	for entry in Run.deck:
 		if CardsDB.can_upgrade(entry):
@@ -19,7 +19,7 @@ func _ready() -> void:
 		$Panel/V/SmithButton.text = "Smith (blocked by Fusion Hammer)"
 
 func _on_rest_button_pressed() -> void:
-	Run.heal(int(Run.max_hp * 0.3))
+	Run.heal(int(Run.max_hp * Run.rest_heal_pct()))
 	_finish("You rest by the fire and recover. HP: %d/%d" % [Run.hp, Run.max_hp])
 
 func _on_smith_button_pressed() -> void:
