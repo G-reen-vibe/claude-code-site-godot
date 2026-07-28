@@ -1,0 +1,11 @@
+# Godot 4 cache/import data
+.godot/
+*.translation
+
+# Imported assets
+.import/
+
+# Exports
+export.cfg
+export_presets.cfg
+build/

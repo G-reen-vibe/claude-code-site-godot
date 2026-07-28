@@ -1,0 +1,473 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/MapScreen.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/CombatScreen.gd" id="3"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.09, 0.075, 0.11, 1)
+
+[node name="Title" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="Title"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Title/Center"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="Title/Center/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9, 0.35, 0.3, 1)
+theme_override_font_sizes/font_size = 64
+text = "SLAY THE SPIRE"
+
+[node name="SubtitleLabel" type="Label" parent="Title/Center/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.65, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 22
+text = "A Godot Demake"
+
+[node name="Spacer" type="Control" parent="Title/Center/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 30)
+
+[node name="StartButton" type="Button" parent="Title/Center/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(240, 56)
+theme_override_font_sizes/font_size = 24
+text = "Begin Run"
+
+[node name="Map" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2")
+
+[node name="HUD" type="PanelContainer" parent="Map"]
+layout_mode = 1
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
+
+[node name="Margin" type="MarginContainer" parent="Map/HUD"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="Map/HUD/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="HPLabel" type="Label" parent="Map/HUD/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.5, 0.45, 1)
+theme_override_font_sizes/font_size = 18
+text = "HP 80/80"
+
+[node name="GoldLabel" type="Label" parent="Map/HUD/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "Gold 99"
+
+[node name="DeckLabel" type="Label" parent="Map/HUD/Margin/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Deck 10 cards"
+
+[node name="FloorLabel" type="Label" parent="Map/HUD/Margin/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Floor 0/8"
+
+[node name="MapArea" type="Control" parent="Map"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Legend" type="Label" parent="Map"]
+layout_mode = 1
+anchor_top = 0.95
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.55, 0.55, 0.6, 1)
+theme_override_font_sizes/font_size = 16
+text = "M = Monster    E = Elite    R = Rest Site    B = Boss"
+
+[node name="Combat" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3")
+
+[node name="TopInfo" type="Label" parent="Combat"]
+layout_mode = 1
+anchor_right = 1.0
+offset_top = 6.0
+offset_bottom = 36.0
+grow_horizontal = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.75, 0.8, 1)
+theme_override_font_sizes/font_size = 20
+text = "Floor 1 - Monster Fight"
+
+[node name="EnemyArea" type="HBoxContainer" parent="Combat"]
+layout_mode = 1
+anchor_left = 0.06
+anchor_top = 0.08
+anchor_right = 0.94
+anchor_bottom = 0.46
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+theme_override_constants/separation = 48
+
+[node name="HintLabel" type="Label" parent="Combat"]
+layout_mode = 1
+anchor_left = 0.1
+anchor_top = 0.46
+anchor_right = 0.9
+anchor_bottom = 0.52
+grow_horizontal = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "Click a card to play it."
+
+[node name="PlayerPanel" type="PanelContainer" parent="Combat"]
+layout_mode = 1
+anchor_left = 0.02
+anchor_top = 0.52
+anchor_right = 0.24
+anchor_bottom = 0.72
+
+[node name="Margin" type="MarginContainer" parent="Combat/PlayerPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Combat/PlayerPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PlayerName" type="Label" parent="Combat/PlayerPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "You (Ironclad)"
+
+[node name="HPBar" type="ProgressBar" parent="Combat/PlayerPanel/Margin/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 14)
+max_value = 80.0
+value = 80.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="Combat/PlayerPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.5, 0.45, 1)
+theme_override_font_sizes/font_size = 16
+text = "HP 80/80"
+
+[node name="BlockLabel" type="Label" parent="Combat/PlayerPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Block: 0"
+
+[node name="StatusLabel" type="Label" parent="Combat/PlayerPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = ""
+
+[node name="EnergyLabel" type="Label" parent="Combat"]
+layout_mode = 1
+anchor_left = 0.83
+anchor_top = 0.52
+anchor_right = 0.98
+anchor_bottom = 0.58
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 26
+text = "Energy 3/3"
+
+[node name="EndTurnButton" type="Button" parent="Combat"]
+layout_mode = 1
+anchor_left = 0.84
+anchor_top = 0.585
+anchor_right = 0.97
+anchor_bottom = 0.655
+theme_override_font_sizes/font_size = 20
+text = "End Turn"
+
+[node name="PilesLabel" type="Label" parent="Combat"]
+layout_mode = 1
+anchor_left = 0.76
+anchor_top = 0.66
+anchor_right = 0.99
+anchor_bottom = 0.71
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
+theme_override_font_sizes/font_size = 14
+text = "Draw 0   Discard 0   Exhaust 0"
+
+[node name="HandArea" type="HBoxContainer" parent="Combat"]
+layout_mode = 1
+anchor_top = 0.72
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="Reward" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="Reward"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Reward/Center"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Reward/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Reward/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="RewardTitle" type="Label" parent="Reward/Center/Panel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 1, 0.55, 1)
+theme_override_font_sizes/font_size = 32
+text = "Victory!"
+
+[node name="GoldLabel" type="Label" parent="Reward/Center/Panel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "You gained 20 gold."
+
+[node name="ChooseLabel" type="Label" parent="Reward/Center/Panel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "Choose a card to add to your deck:"
+
+[node name="CardChoices" type="HBoxContainer" parent="Reward/Center/Panel/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="SkipButton" type="Button" parent="Reward/Center/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(160, 40)
+text = "Skip"
+
+[node name="Rest" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="Rest"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Rest/Center"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Rest/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="Rest/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="RestTitle" type="Label" parent="Rest/Center/Panel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.7, 0.35, 1)
+theme_override_font_sizes/font_size = 32
+text = "Rest Site"
+
+[node name="RestInfo" type="Label" parent="Rest/Center/Panel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "You settle down by the fire."
+
+[node name="HealButton" type="Button" parent="Rest/Center/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 48)
+theme_override_font_sizes/font_size = 20
+text = "Rest  (+25 HP)"
+
+[node name="ContinueButton" type="Button" parent="Rest/Center/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 40)
+text = "Continue"
+
+[node name="GameOver" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="GameOver"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="GameOver/Center"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="OverTitle" type="Label" parent="GameOver/Center/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 56
+text = "DEFEATED"
+
+[node name="OverInfo" type="Label" parent="GameOver/Center/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+text = "You made it to floor 1 of 8."
+
+[node name="RestartButton" type="Button" parent="GameOver/Center/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 48)
+theme_override_font_sizes/font_size = 20
+text = "Try Again"
+
+[node name="Victory" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="Victory"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Victory/Center"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="VictoryTitle" type="Label" parent="Victory/Center/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 1, 0.55, 1)
+theme_override_font_sizes/font_size = 56
+text = "VICTORY!"
+
+[node name="VictoryInfo" type="Label" parent="Victory/Center/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+text = "The Guardian falls!"
+
+[node name="RestartButton" type="Button" parent="Victory/Center/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 48)
+theme_override_font_sizes/font_size = 20
+text = "New Run"
