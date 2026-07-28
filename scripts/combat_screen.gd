@@ -3,6 +3,7 @@ extends Control
 
 const CARD_SCENE := preload("res://scenes/Card.tscn")
 const ENEMY_SCENE := preload("res://scenes/Enemy.tscn")
+const CARD_PICKER := preload("res://scenes/CardPicker.tscn")
 const DEFAULT_PROMPT := "Play cards, then press End Turn."
 
 var enemies: Array = []
@@ -18,6 +19,7 @@ var energy_cap := 3
 var turn := 0
 var strength := 0
 var strength_down := 0
+var dexterity := 0
 var vulnerable := 0
 var weak := 0
 var frail := 0
@@ -26,6 +28,10 @@ var demon_form := 0
 var thorns := 0
 var feel_no_pain := 0
 var dark_embrace := 0
+var noxious_fumes := 0
+var thousand_cuts := 0
+var after_image := 0
+var next_turn_block := 0
 var cleaning_up := false
 
 var selected_card: Panel = null
@@ -36,6 +42,7 @@ var node_type := "monster"
 
 func _ready() -> void:
 	node_type = Run.pending_node_type
+	energy_cap = 3 + RelicsDB.energy_bonus(Run.relics)
 	$Hud.potions_usable = true
 	$Hud.potion_pressed.connect(_on_potion_pressed)
 	for id in Run.pending_encounter:
@@ -61,6 +68,9 @@ func _ready() -> void:
 	if Run.relics.has("bag_of_marbles"):
 		for e in enemies:
 			e.vulnerable += 1
+	if Run.relics.has("philosophers_stone"):
+		for e in enemies:
+			e.strength += 1
 	_start_player_turn()
 
 func _start_player_turn() -> void:
@@ -68,10 +78,20 @@ func _start_player_turn() -> void:
 	block = 0
 	if turn == 1 and Run.relics.has("anchor"):
 		block = 10
+	if next_turn_block > 0:
+		block += next_turn_block
+		$Player.play_block_gain(next_turn_block)
+		next_turn_block = 0
 	energy = energy_cap + (1 if turn == 1 and Run.relics.has("lantern") else 0)
 	if demon_form > 0:
 		strength += demon_form
-	_draw_cards(5)
+	if noxious_fumes > 0:
+		for i in _alive():
+			enemies[i].poison += noxious_fumes
+	var draws := 5
+	if turn == 1 and Run.relics.has("ring_of_snake"):
+		draws += 2
+	_draw_cards(draws)
 	busy = false
 	_set_prompt(DEFAULT_PROMPT)
 	_show_banner("YOUR TURN")
@@ -96,12 +116,14 @@ func _draw_cards(n: int) -> void:
 			draw_pile = discard_pile
 			discard_pile = []
 			Run.shuffle_array(draw_pile)
-		var entry: Dictionary = draw_pile.pop_back()
-		var cu := CARD_SCENE.instantiate()
-		cu.entry = entry
-		$Hand.add_child(cu)
-		cu.clicked.connect(_on_card_clicked)
-		hand.append(cu)
+		_add_to_hand(draw_pile.pop_back())
+
+func _add_to_hand(entry: Dictionary) -> void:
+	var cu := CARD_SCENE.instantiate()
+	cu.entry = entry
+	$Hand.add_child(cu)
+	cu.clicked.connect(_on_card_clicked)
+	hand.append(cu)
 
 func _set_prompt(t: String) -> void:
 	$Prompt.text = t
@@ -192,9 +214,17 @@ func _play(card: Panel, target_idx: int) -> void:
 			_exhaust(entry)
 		else:
 			discard_pile.append(entry)
+		_card_played_triggers()
 		_set_prompt(DEFAULT_PROMPT)
 	_update_ui()
 	_check_victory()
+
+func _card_played_triggers() -> void:
+	if thousand_cuts > 0:
+		for i in _alive():
+			_damage_enemy(i, thousand_cuts)
+	if after_image > 0:
+		block += after_image
 
 func _apply_card(def: Dictionary, entry: Dictionary, target_idx: int, x_value: int) -> void:
 	if def.type == "attack":
@@ -208,12 +238,18 @@ func _apply_card(def: Dictionary, entry: Dictionary, target_idx: int, x_value: i
 	energy += def.get("energy", 0)
 	strength += def.get("strength", 0)
 	strength_down += def.get("strength_down", 0)
+	dexterity += def.get("dexterity", 0)
 	metallicize += def.get("metallicize", 0)
 	demon_form += def.get("demon_form", 0)
 	feel_no_pain += def.get("feel_no_pain", 0)
 	dark_embrace += def.get("dark_embrace", 0)
+	noxious_fumes += def.get("noxious_fumes", 0)
+	thousand_cuts += def.get("thousand_cuts", 0)
+	after_image += def.get("after_image", 0)
 	if def.get("block", 0) > 0:
-		_gain_block(def.block)
+		_gain_block(def.block + dexterity)
+	if def.get("next_turn_block", 0) > 0:
+		next_turn_block += def.next_turn_block + dexterity
 	if def.get("double_block", false) and block > 0:
 		_gain_block(block)
 	if def.get("armaments", false):
@@ -229,7 +265,7 @@ func _apply_card(def: Dictionary, entry: Dictionary, target_idx: int, x_value: i
 	var base := int(def.get("damage", 0))
 	if def.get("damage_from_block", false):
 		base += block
-	base += int(entry.get("_bonus", 0))
+	base = max(0, base + int(entry.get("_bonus", 0)))
 	if base > 0 and not targets.is_empty():
 		var hits: int = x_value if def.get("x_cost", false) else def.get("hits", 1)
 		for h in hits:
@@ -252,15 +288,30 @@ func _apply_card(def: Dictionary, entry: Dictionary, target_idx: int, x_value: i
 					if Run.hp <= 0:
 						_lose()
 						return
-	if def.get("rampage", 0) > 0:
+	if def.get("rampage", 0) != 0:
 		entry["_bonus"] = int(entry.get("_bonus", 0)) + int(def.rampage)
 	for ti in targets:
 		if enemies[ti].hp <= 0:
 			continue
 		enemies[ti].vulnerable += def.get("vulnerable", 0)
 		enemies[ti].weak += def.get("weak", 0)
+		enemies[ti].poison += def.get("poison", 0)
+		if def.get("poison_mult", 0) > 0:
+			enemies[ti].poison *= def.poison_mult
+	if def.get("add_shivs", 0) > 0:
+		for n in def.add_shivs:
+			if hand.size() < 10:
+				_add_to_hand({"id": "shiv", "up": false})
 	if def.get("draw", 0) > 0:
 		_draw_cards(def.draw)
+	if def.get("discard_random", 0) > 0:
+		for n in def.discard_random:
+			if hand.is_empty():
+				break
+			var victim: Panel = hand[Run.rng.randi_range(0, hand.size() - 1)]
+			hand.erase(victim)
+			discard_pile.append(victim.entry)
+			victim.queue_free()
 	if def.get("copy_to_discard", false):
 		discard_pile.append(entry.duplicate())
 
@@ -290,7 +341,24 @@ func _damage_enemy(idx: int, dmg: int) -> int:
 		enemy_uis[idx].play_hit(unblocked)
 	else:
 		enemy_uis[idx].play_blocked()
+	_check_revive(idx)
 	return unblocked
+
+func _check_revive(idx: int) -> void:
+	var e: Dictionary = enemies[idx]
+	if e.hp > 0:
+		return
+	var rev: Dictionary = e.extra.get("revive", {})
+	if rev.is_empty() or rev.used:
+		return
+	rev.used = true
+	e.hp = rev.hp
+	e.vulnerable = 0
+	e.weak = 0
+	e.poison = 0
+	e.strength += 2
+	e.intent = EnemiesDB.choose_intent(e, Run.rng)
+	enemy_uis[idx].play_reborn()
 
 func _player_take_damage(dmg: int) -> void:
 	var blocked: int = min(block, dmg)
@@ -365,7 +433,9 @@ func _win() -> void:
 		return
 	combat_over = true
 	busy = true
-	if Run.relics.has("burning_blood"):
+	if Run.relics.has("black_blood"):
+		Run.heal(12)
+	elif Run.relics.has("burning_blood"):
 		Run.heal(6)
 	if Run.relics.has("meat_on_the_bone") and Run.hp * 2 <= Run.max_hp:
 		Run.heal(12)
@@ -375,13 +445,18 @@ func _win() -> void:
 			gold_gain = 12 + Run.current_row + Run.rng.randi_range(0, 8)
 		"elite":
 			gold_gain = 30 + Run.current_row + Run.rng.randi_range(0, 10)
+		"boss":
+			gold_gain = 70 + Run.rng.randi_range(0, 25)
 	Run.gold += gold_gain
 	Run.pending_reward = {"gold": gold_gain, "node_type": node_type}
 	if node_type != "boss" and Run.rng.randf() < 0.4:
 		Run.pending_reward["potion"] = PotionsDB.random_id(Run.rng)
 	if node_type == "boss":
-		Run.victory = true
-		_goto_delayed("game_over")
+		if Run.act < Run.ACTS:
+			_goto_delayed("boss_reward")
+		else:
+			Run.victory = true
+			_goto_delayed("game_over")
 	else:
 		_goto_delayed("reward")
 
@@ -454,12 +529,30 @@ func _on_end_turn_pressed() -> void:
 
 func _enemy_act(idx: int) -> void:
 	var e: Dictionary = enemies[idx]
+	if e.poison > 0:
+		e.hp = max(0, e.hp - e.poison)
+		enemy_uis[idx].play_poison(e.poison)
+		e.poison -= 1
+		_check_revive(idx)
+		if e.hp <= 0:
+			if _alive().is_empty():
+				_win()
+			return
 	e.block = 0
 	var it: Dictionary = e.intent
 	e.block += it.get("block", 0)
 	e.strength += it.get("strength", 0)
 	e.ritual += it.get("ritual", 0)
 	e.thorns = max(0, e.thorns + it.get("thorns", 0))
+	if it.get("heal_allies", 0) > 0:
+		for ai in _alive():
+			enemies[ai].hp = min(enemies[ai].max_hp, enemies[ai].hp + it.heal_allies)
+	if it.get("buff_all", 0) > 0:
+		for ai in _alive():
+			enemies[ai].strength += it.buff_all
+	if it.get("block_all", 0) > 0:
+		for ai in _alive():
+			enemies[ai].block += it.block_all
 	if it.get("dmg", 0) > 0:
 		enemy_uis[idx].play_lunge()
 		for h in it.get("hits", 1):
@@ -471,6 +564,13 @@ func _enemy_act(idx: int) -> void:
 			if vulnerable > 0:
 				dmg = int(dmg * 1.5)
 			_player_take_damage(dmg)
+			if it.get("heal_self_from_damage", false):
+				e.hp = min(e.max_hp, e.hp + dmg)
+			if it.get("steal_gold", 0) > 0:
+				var stolen: int = min(Run.gold, it.steal_gold)
+				Run.gold -= stolen
+				if stolen > 0:
+					$Player.play_gold_stolen(stolen)
 			if thorns > 0:
 				_damage_enemy(idx, thorns)
 			if Run.hp <= 0:
@@ -497,10 +597,24 @@ func _enemy_act(idx: int) -> void:
 
 # --------------------------------------------------------------------- ui ----
 
+func _on_draw_button_pressed() -> void:
+	var entries := draw_pile.duplicate()
+	entries.sort_custom(func(a, b) -> bool: return String(a.id) < String(b.id))
+	var picker := CARD_PICKER.instantiate()
+	add_child(picker)
+	picker.open(entries, "Draw Pile (%d cards, order hidden)" % entries.size(), false)
+
+func _on_discard_button_pressed() -> void:
+	var picker := CARD_PICKER.instantiate()
+	add_child(picker)
+	picker.open(discard_pile, "Discard Pile (%d) — Exhausted: %d" % [discard_pile.size(), exhaust_pile.size()], false)
+
 func _player_status_text() -> String:
 	var parts: Array = []
 	if strength != 0:
 		parts.append("Str %d" % strength)
+	if dexterity != 0:
+		parts.append("Dex %d" % dexterity)
 	if vulnerable > 0:
 		parts.append("Vuln %d" % vulnerable)
 	if weak > 0:
@@ -517,14 +631,22 @@ func _player_status_text() -> String:
 		parts.append("FNP %d" % feel_no_pain)
 	if dark_embrace > 0:
 		parts.append("Dark Embrace")
+	if noxious_fumes > 0:
+		parts.append("Fumes %d" % noxious_fumes)
+	if thousand_cuts > 0:
+		parts.append("1000 Cuts %d" % thousand_cuts)
+	if after_image > 0:
+		parts.append("After Image %d" % after_image)
+	if next_turn_block > 0:
+		parts.append("Next Block %d" % next_turn_block)
 	return " · ".join(PackedStringArray(parts))
 
 func _update_ui() -> void:
 	$Hud.refresh()
 	$Player.refresh(block, _player_status_text())
 	$EnergyOrb/EnergyLabel.text = "%d/%d" % [energy, energy_cap]
-	$DrawLabel.text = "Draw: %d" % draw_pile.size()
-	$DiscardLabel.text = "Discard: %d   Exhaust: %d" % [discard_pile.size(), exhaust_pile.size()]
+	$DrawButton.text = "Draw: %d" % draw_pile.size()
+	$DiscardButton.text = "Discard: %d | Exh: %d" % [discard_pile.size(), exhaust_pile.size()]
 	$EndTurnButton.disabled = busy or combat_over
 	for ui in enemy_uis:
 		ui.refresh(vulnerable)

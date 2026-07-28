@@ -11,6 +11,12 @@ func _ready() -> void:
 			has_upgradable = true
 			break
 	$Panel/V/SmithButton.disabled = not has_upgradable
+	if Run.relics.has("coffee_dripper"):
+		$Panel/V/RestButton.disabled = true
+		$Panel/V/RestButton.text = "Rest (blocked by Coffee Dripper)"
+	if Run.relics.has("fusion_hammer"):
+		$Panel/V/SmithButton.disabled = true
+		$Panel/V/SmithButton.text = "Smith (blocked by Fusion Hammer)"
 
 func _on_rest_button_pressed() -> void:
 	Run.heal(int(Run.max_hp * 0.3))

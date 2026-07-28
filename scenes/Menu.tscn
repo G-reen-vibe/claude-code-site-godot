@@ -62,18 +62,28 @@ text = "Climb the Spire node by node. In combat, click a card to play it, click 
 
 [node name="StartButton" type="Button" parent="."]
 offset_left = 530.0
-offset_top = 330.0
+offset_top = 320.0
 offset_right = 750.0
-offset_bottom = 388.0
+offset_bottom = 378.0
 theme_override_font_sizes/font_size = 22
-text = "Begin Run"
+text = "New Run"
+
+[node name="ContinueButton" type="Button" parent="."]
+visible = false
+offset_left = 546.0
+offset_top = 394.0
+offset_right = 734.0
+offset_bottom = 442.0
+theme_override_font_sizes/font_size = 17
+text = "Continue Run"
 
 [node name="QuitButton" type="Button" parent="."]
 offset_left = 566.0
-offset_top = 408.0
+offset_top = 458.0
 offset_right = 714.0
-offset_bottom = 452.0
+offset_bottom = 500.0
 text = "Quit"
 
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="ContinueButton" to="." method="_on_continue_button_pressed"]
 [connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]

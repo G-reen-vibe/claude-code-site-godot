@@ -5,6 +5,7 @@ const ICON_WIN := preload("res://assets/icons/boss.svg")
 const ICON_LOSE := preload("res://assets/icons/skull.svg")
 
 func _ready() -> void:
+	Run.delete_save()
 	if Run.victory:
 		$Icon.texture = ICON_WIN
 		$Title.text = "VICTORY!"

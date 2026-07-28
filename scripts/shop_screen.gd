@@ -12,7 +12,7 @@ var relic_offer: Dictionary = {}
 var removed_used := false
 
 func _ready() -> void:
-	for id in CardsDB.random_rewards(Run.rng, 5):
+	for id in CardsDB.random_rewards(Run.rng, Run.character, 5):
 		var def := CardsDB.get_def({"id": id, "up": false})
 		var price := 50
 		match def.rarity:

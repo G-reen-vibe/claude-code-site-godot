@@ -118,7 +118,7 @@ func _transmogrify() -> void:
 	_pick_card("Choose a card to transform", func(idx: int) -> void:
 		var old: String = CardsDB.get_def(Run.deck[idx]).display_name
 		Run.deck.remove_at(idx)
-		var new_id := CardsDB.random_of_pool(Run.rng)
+		var new_id := CardsDB.random_of_pool(Run.rng, Run.character)
 		Run.deck.append({"id": new_id, "up": false})
 		_finish("%s twists and reforms into %s!" % [old, CardsDB.CARDS[new_id].name]))
 

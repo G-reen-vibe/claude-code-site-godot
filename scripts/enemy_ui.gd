@@ -54,9 +54,17 @@ func _status_text() -> String:
 		parts.append("Ritual %d" % data.ritual)
 	if data.thorns > 0:
 		parts.append("Thorns %d" % data.thorns)
+	if data.get("poison", 0) > 0:
+		parts.append("Poison %d" % data.poison)
 	return " · ".join(PackedStringArray(parts))
 
 func _refresh_intent(player_vulnerable: int) -> void:
+	if Run.relics.has("runic_dome"):
+		$V/IntentBox/IntentIcon.texture = ICON_UNKNOWN
+		$V/IntentBox/IntentNum.visible = false
+		$V/IntentName.text = "???"
+		tooltip_text = "Runic Dome hides enemy intents."
+		return
 	var it: Dictionary = data.intent
 	var icon: Texture2D = ICON_UNKNOWN
 	var txt := ""
@@ -126,6 +134,17 @@ func play_hit(amount: int) -> void:
 func play_blocked() -> void:
 	var sprite: TextureRect = $V/SpriteBox/Sprite
 	FloatText.spawn(self, sprite.global_position + sprite.size / 2.0, "Blocked", Color(0.6, 0.8, 1), 20)
+
+func play_poison(amount: int) -> void:
+	var sprite: TextureRect = $V/SpriteBox/Sprite
+	FloatText.spawn(self, sprite.global_position + sprite.size / 2.0, "%d Poison" % amount, Color(0.6, 0.95, 0.4), 24)
+
+func play_reborn() -> void:
+	var sprite: TextureRect = $V/SpriteBox/Sprite
+	FloatText.spawn(self, sprite.global_position + sprite.size / 2.0, "REBORN!", Color(0.95, 0.3, 0.45), 32)
+	var tw := create_tween()
+	tw.tween_property(sprite, "modulate", Color(1.6, 0.6, 0.7), 0.25)
+	tw.tween_property(sprite, "modulate", Color.WHITE, 0.4)
 
 func play_lunge() -> void:
 	var sprite: TextureRect = $V/SpriteBox/Sprite

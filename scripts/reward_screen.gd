@@ -28,7 +28,7 @@ func _ready() -> void:
 			$Panel/V/PotionRow/PotionButton.text += " — belt full!"
 	else:
 		$Panel/V/PotionRow.visible = false
-	for id in CardsDB.random_rewards(Run.rng, 3):
+	for id in CardsDB.random_rewards(Run.rng, Run.character, 3):
 		var cu := CARD_SCENE.instantiate()
 		cu.entry = {"id": id, "up": false}
 		$Panel/V/Cards.add_child(cu)

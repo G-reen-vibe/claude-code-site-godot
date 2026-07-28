@@ -11,7 +11,11 @@ const TYPE_INFO := {
 }
 const MARKER_TEX := preload("res://assets/sprites/ironclad.svg")
 
+const ACT_NAMES := {1: "The Exordium", 2: "The City", 3: "The Beyond"}
+
 func _ready() -> void:
+	Run.save_game()
+	$Title.text = "ACT %d: %s — choose your path, bottom to top" % [Run.act, ACT_NAMES.get(Run.act, "?")]
 	$Hud.potion_pressed.connect(_on_potion_pressed)
 	_build()
 
@@ -80,7 +84,7 @@ func _on_node_pressed(r: int, c: int) -> void:
 	match node.type:
 		"monster", "elite", "boss":
 			Run.pending_node_type = node.type
-			Run.pending_encounter = EnemiesDB.encounter(node.type, r, Run.rng)
+			Run.pending_encounter = EnemiesDB.encounter(node.type, r, Run.rng, Run.act)
 			_main().goto("combat")
 		"rest":
 			_main().goto("rest")
