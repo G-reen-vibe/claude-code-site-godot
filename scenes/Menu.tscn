@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/menu_screen.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/spire_bg.svg" id="2"]
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -11,51 +12,68 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="BG" type="ColorRect" parent="."]
+[node name="BG" type="TextureRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.07, 0.06, 0.1, 1)
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
 
 [node name="Title" type="Label" parent="."]
-offset_left = 140.0
-offset_top = 140.0
-offset_right = 1140.0
+offset_left = 90.0
+offset_top = 120.0
+offset_right = 1190.0
 offset_bottom = 230.0
-theme_override_colors/font_color = Color(0.9, 0.3, 0.25, 1)
-theme_override_font_sizes/font_size = 52
+theme_override_colors/font_color = Color(0.94, 0.78, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.05, 0.02, 1)
+theme_override_constants/outline_size = 14
+theme_override_font_sizes/font_size = 72
 horizontal_alignment = 1
 text = "SLAY THE SPIRE"
 
 [node name="Subtitle" type="Label" parent="."]
 offset_left = 140.0
-offset_top = 235.0
+offset_top = 236.0
 offset_right = 1140.0
-offset_bottom = 270.0
-theme_override_colors/font_color = Color(0.75, 0.72, 0.8, 1)
-theme_override_font_sizes/font_size = 18
+offset_bottom = 272.0
+theme_override_colors/font_color = Color(0.82, 0.78, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
 text = "A deckbuilding roguelike — Ironclad demake built with Godot"
 
 [node name="HowTo" type="Label" parent="."]
-offset_left = 300.0
-offset_top = 320.0
-offset_right = 980.0
-offset_bottom = 470.0
-theme_override_colors/font_color = Color(0.65, 0.65, 0.72, 1)
+offset_left = 320.0
+offset_top = 560.0
+offset_right = 960.0
+offset_bottom = 680.0
+theme_override_colors/font_color = Color(0.72, 0.7, 0.75, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 autowrap_mode = 3
-text = "Climb the Spire by choosing a path on the map. In combat, click a card to play it (attacks with multiple foes ask you to click a target), then press End Turn. Enemies telegraph their intents above their heads. Collect cards and relics, rest to heal or upgrade, and defeat The Guardian at the top."
+text = "Climb the Spire node by node. In combat, click a card to play it, click an enemy to target, and end your turn to watch their telegraphed intents unfold. Gather cards, relics and potions — and slay the boss waiting at the top."
 
 [node name="StartButton" type="Button" parent="."]
-offset_left = 540.0
-offset_top = 510.0
-offset_right = 740.0
-offset_bottom = 560.0
-theme_override_font_sizes/font_size = 20
+offset_left = 530.0
+offset_top = 330.0
+offset_right = 750.0
+offset_bottom = 388.0
+theme_override_font_sizes/font_size = 22
 text = "Begin Run"
 
+[node name="QuitButton" type="Button" parent="."]
+offset_left = 566.0
+offset_top = 408.0
+offset_right = 714.0
+offset_bottom = 452.0
+text = "Quit"
+
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]

@@ -15,6 +15,10 @@ config/icon="res://icon.svg"
 
 Run="*res://scripts/run.gd"
 
+[gui]
+
+theme/custom="res://theme/main_theme.tres"
+
 [display]
 
 window/size/viewport_width=1280

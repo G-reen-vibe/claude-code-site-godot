@@ -1,0 +1,78 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/neow_screen.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/spire_bg.svg" id="2"]
+
+[node name="Neow" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="BG" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 360.0
+offset_top = 120.0
+offset_right = 920.0
+offset_bottom = 600.0
+
+[node name="V" type="VBoxContainer" parent="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 24.0
+offset_right = -30.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Panel/V"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+text = "Neow's Blessing"
+
+[node name="Desc" type="Label" parent="Panel/V"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.78, 0.75, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+autowrap_mode = 3
+text = "The great whale offers you a gift before your climb. Choose one:"
+
+[node name="MaxHPButton" type="Button" parent="Panel/V"]
+layout_mode = 2
+text = "Gain 8 Max HP"
+
+[node name="GoldButton" type="Button" parent="Panel/V"]
+layout_mode = 2
+text = "Gain 100 Gold"
+
+[node name="RelicButton" type="Button" parent="Panel/V"]
+layout_mode = 2
+text = "Obtain a random relic"
+
+[node name="RemoveButton" type="Button" parent="Panel/V"]
+layout_mode = 2
+text = "Remove a card from your deck"
+
+[connection signal="pressed" from="Panel/V/MaxHPButton" to="." method="_on_max_hp_pressed"]
+[connection signal="pressed" from="Panel/V/GoldButton" to="." method="_on_gold_pressed"]
+[connection signal="pressed" from="Panel/V/RelicButton" to="." method="_on_relic_pressed"]
+[connection signal="pressed" from="Panel/V/RemoveButton" to="." method="_on_remove_pressed"]

@@ -1,8 +1,9 @@
 class_name CardsDB
-## Static card database. Effects are plain dictionary fields interpreted by the
-## combat screen: damage, hits, block, draw, energy, vulnerable, weak, strength,
-## strength_down, metallicize, demon_form, self_damage, heal_from_damage,
-## copy_to_discard, exhaust.
+## Static card database. Effect fields interpreted by combat_screen.gd:
+## damage, hits, block, draw, energy, vulnerable, weak, strength, strength_down,
+## metallicize, demon_form, self_damage, heal_from_damage, copy_to_discard,
+## exhaust, unplayable, x_cost, strength_mult, damage_from_block, double_block,
+## rampage, armaments, feel_no_pain, dark_embrace, ethereal, end_turn_damage.
 
 const CARDS: Dictionary = {
 	"strike": {
@@ -66,6 +67,22 @@ const CARDS: Dictionary = {
 		"damage": 3, "hits": 3, "text": "Deal 3 damage 3 times.",
 		"up": {"hits": 4, "text": "Deal 3 damage 4 times."},
 	},
+	"heavy_blade": {
+		"name": "Heavy Blade", "type": "attack", "rarity": "common", "cost": 2, "target": "enemy",
+		"damage": 14, "strength_mult": 3, "text": "Deal 14 damage. Strength affects this card 3 times.",
+		"up": {"strength_mult": 5, "text": "Deal 14 damage. Strength affects this card 5 times."},
+	},
+	"body_slam": {
+		"name": "Body Slam", "type": "attack", "rarity": "common", "cost": 1, "target": "enemy",
+		"damage": 0, "damage_from_block": true, "text": "Deal damage equal to your Block.",
+		"up": {"cost": 0, "text": "Deal damage equal to your Block."},
+	},
+	"armaments": {
+		"name": "Armaments", "type": "skill", "rarity": "common", "cost": 1, "target": "self",
+		"block": 5, "armaments": true,
+		"text": "Gain 5 Block. Upgrade all cards in your hand for this combat.",
+		"up": {"block": 8, "text": "Gain 8 Block. Upgrade all cards in your hand for this combat."},
+	},
 	"uppercut": {
 		"name": "Uppercut", "type": "attack", "rarity": "uncommon", "cost": 2, "target": "enemy",
 		"damage": 13, "weak": 1, "vulnerable": 1,
@@ -114,6 +131,33 @@ const CARDS: Dictionary = {
 		"damage": 20, "text": "Deal 20 damage.",
 		"up": {"damage": 28, "text": "Deal 28 damage."},
 	},
+	"whirlwind": {
+		"name": "Whirlwind", "type": "attack", "rarity": "uncommon", "cost": 0, "target": "all",
+		"x_cost": true, "damage": 5,
+		"text": "Deal 5 damage to ALL enemies X times. (X = all your Energy)",
+		"up": {"damage": 8, "text": "Deal 8 damage to ALL enemies X times. (X = all your Energy)"},
+	},
+	"entrench": {
+		"name": "Entrench", "type": "skill", "rarity": "uncommon", "cost": 2, "target": "self",
+		"double_block": true, "text": "Double your Block.",
+		"up": {"cost": 1, "text": "Double your Block."},
+	},
+	"seeing_red": {
+		"name": "Seeing Red", "type": "skill", "rarity": "uncommon", "cost": 1, "target": "self",
+		"energy": 2, "exhaust": true, "text": "Gain 2 Energy. Exhaust.",
+		"up": {"cost": 0, "text": "Gain 2 Energy. Exhaust."},
+	},
+	"rampage": {
+		"name": "Rampage", "type": "attack", "rarity": "uncommon", "cost": 2, "target": "enemy",
+		"damage": 8, "rampage": 5,
+		"text": "Deal 8 damage. Each time this is played, its damage rises by 5 this combat.",
+		"up": {"rampage": 8, "text": "Deal 8 damage. Each time this is played, its damage rises by 8 this combat."},
+	},
+	"feel_no_pain": {
+		"name": "Feel No Pain", "type": "power", "rarity": "uncommon", "cost": 1, "target": "self",
+		"feel_no_pain": 3, "text": "Whenever a card is Exhausted, gain 3 Block.",
+		"up": {"feel_no_pain": 4, "text": "Whenever a card is Exhausted, gain 4 Block."},
+	},
 	"bludgeon": {
 		"name": "Bludgeon", "type": "attack", "rarity": "rare", "cost": 3, "target": "enemy",
 		"damage": 32, "text": "Deal 32 damage.",
@@ -141,19 +185,53 @@ const CARDS: Dictionary = {
 		"text": "Deal 4 damage to ALL enemies. Heal HP equal to unblocked damage.",
 		"up": {"damage": 5, "text": "Deal 5 damage to ALL enemies. Heal HP equal to unblocked damage."},
 	},
+	"dark_embrace": {
+		"name": "Dark Embrace", "type": "power", "rarity": "rare", "cost": 2, "target": "self",
+		"dark_embrace": 1, "text": "Whenever a card is Exhausted, draw 1 card.",
+		"up": {"cost": 1, "text": "Whenever a card is Exhausted, draw 1 card."},
+	},
+	"slimed": {
+		"name": "Slimed", "type": "status", "rarity": "status", "cost": 1, "target": "self",
+		"exhaust": true, "text": "Unplayable filler. Exhaust.",
+		"up": {},
+	},
+	"wound": {
+		"name": "Wound", "type": "status", "rarity": "status", "cost": 0, "target": "self",
+		"unplayable": true, "text": "Unplayable.",
+		"up": {},
+	},
+	"dazed": {
+		"name": "Dazed", "type": "status", "rarity": "status", "cost": 0, "target": "self",
+		"unplayable": true, "ethereal": true, "text": "Unplayable. Ethereal: exhausts at end of turn.",
+		"up": {},
+	},
+	"burn": {
+		"name": "Burn", "type": "status", "rarity": "status", "cost": 0, "target": "self",
+		"unplayable": true, "end_turn_damage": 2,
+		"text": "Unplayable. At the end of your turn, take 2 damage.",
+		"up": {},
+	},
+	"injury": {
+		"name": "Injury", "type": "curse", "rarity": "curse", "cost": 0, "target": "self",
+		"unplayable": true, "text": "Unplayable. A permanent wound.",
+		"up": {},
+	},
 }
 
 static func get_def(entry: Dictionary) -> Dictionary:
 	var base: Dictionary = CARDS[entry.id]
 	var def := base.duplicate(true)
 	def.erase("up")
-	if entry.get("up", false):
+	if entry.get("up", false) and not base.up.is_empty():
 		for k in base.up:
 			def[k] = base.up[k]
 		def["display_name"] = str(base.name) + "+"
 	else:
 		def["display_name"] = base.name
 	return def
+
+static func can_upgrade(entry: Dictionary) -> bool:
+	return not entry.get("up", false) and not CARDS[entry.id].up.is_empty()
 
 static func describe(entry: Dictionary) -> String:
 	var def := get_def(entry)
@@ -175,12 +253,19 @@ static func random_rewards(rng: RandomNumberGenerator, n: int = 3) -> Array:
 		guard += 1
 		var roll := rng.randf()
 		var rarity := "common"
-		if roll < 0.06:
+		if roll < 0.07:
 			rarity = "rare"
-		elif roll < 0.40:
+		elif roll < 0.42:
 			rarity = "uncommon"
 		var pool := ids_by_rarity(rarity)
 		var id: String = pool[rng.randi_range(0, pool.size() - 1)]
 		if not out.has(id):
 			out.append(id)
 	return out
+
+static func random_of_pool(rng: RandomNumberGenerator) -> String:
+	# Any obtainable (non-starter, non-status, non-curse) card.
+	var pool: Array = []
+	for r in ["common", "uncommon", "rare"]:
+		pool.append_array(ids_by_rarity(r))
+	return pool[rng.randi_range(0, pool.size() - 1)]

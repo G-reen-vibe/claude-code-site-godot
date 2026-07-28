@@ -1,0 +1,120 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/hud_bar.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/icons/heart.svg" id="2"]
+[ext_resource type="Texture2D" path="res://assets/icons/gold.svg" id="3"]
+[ext_resource type="Texture2D" path="res://assets/icons/potion.svg" id="4"]
+[ext_resource type="Texture2D" path="res://assets/icons/deck.svg" id="5"]
+
+[node name="HudBar" type="Control"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
+script = ExtResource("1")
+
+[node name="BG" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+mouse_filter = 2
+
+[node name="H" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 6.0
+offset_right = -14.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="HeartIcon" type="TextureRect" parent="H"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HPLabel" type="Label" parent="H"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.6, 0.58, 1)
+theme_override_font_sizes/font_size = 17
+text = "80/80"
+
+[node name="GoldIcon" type="TextureRect" parent="H"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GoldLabel" type="Label" parent="H"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.87, 0.45, 1)
+theme_override_font_sizes/font_size = 17
+text = "99"
+
+[node name="FloorLabel" type="Label" parent="H"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.73, 0.7, 1)
+text = "Floor 0/14"
+
+[node name="Sep1" type="Control" parent="H"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="PotionBox" type="HBoxContainer" parent="H"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Potion0" type="TextureRect" parent="H/PotionBox"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Potion1" type="TextureRect" parent="H/PotionBox"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Potion2" type="TextureRect" parent="H/PotionBox"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Spacer" type="Control" parent="H"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RelicBox" type="HBoxContainer" parent="H"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DeckButton" type="Button" parent="H"]
+layout_mode = 2
+size_flags_vertical = 4
+icon = ExtResource("5")
+text = "Deck"
+expand_icon = true
+
+[connection signal="gui_input" from="H/PotionBox/Potion0" to="." method="_on_potion_input" binds= [0]]
+[connection signal="gui_input" from="H/PotionBox/Potion1" to="." method="_on_potion_input" binds= [1]]
+[connection signal="gui_input" from="H/PotionBox/Potion2" to="." method="_on_potion_input" binds= [2]]
+[connection signal="pressed" from="H/DeckButton" to="." method="_on_deck_button_pressed"]

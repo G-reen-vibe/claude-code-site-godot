@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/treasure_screen.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/HudBar.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/icons/chest.svg" id="3"]
+
+[sub_resource type="Gradient" id="Gradient_tr"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.13, 0.11, 0.06, 1, 0.05, 0.05, 0.04, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_tr"]
+gradient = SubResource("Gradient_tr")
+fill_from = Vector2(0.5, 0)
+fill_to = Vector2(0.5, 1)
 
 [node name="Treasure" type="Control"]
 layout_mode = 3
@@ -11,40 +22,64 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="BG" type="ColorRect" parent="."]
+[node name="BG" type="TextureRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.09, 0.06, 1)
+texture = SubResource("GradientTexture2D_tr")
+mouse_filter = 2
 
-[node name="Title" type="Label" parent="."]
-offset_left = 440.0
-offset_top = 120.0
-offset_right = 840.0
-offset_bottom = 180.0
-theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_font_sizes/font_size = 40
+[node name="Hud" parent="." instance=ExtResource("2")]
+
+[node name="Chest" type="TextureRect" parent="."]
+offset_left = 555.0
+offset_top = 110.0
+offset_right = 725.0
+offset_bottom = 280.0
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 390.0
+offset_top = 310.0
+offset_right = 890.0
+offset_bottom = 560.0
+
+[node name="V" type="VBoxContainer" parent="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 22.0
+offset_right = -30.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Panel/V"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.83, 0.4, 1)
+theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 text = "TREASURE"
 
-[node name="ResultLabel" type="Label" parent="."]
-offset_left = 240.0
-offset_top = 260.0
-offset_right = 1040.0
-offset_bottom = 380.0
-theme_override_font_sizes/font_size = 18
+[node name="Result" type="Label" parent="Panel/V"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 17
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 text = ""
 
-[node name="ContinueButton" type="Button" parent="."]
-offset_left = 555.0
-offset_top = 450.0
-offset_right = 725.0
-offset_bottom = 495.0
+[node name="ContinueButton" type="Button" parent="Panel/V"]
+layout_mode = 2
+size_flags_horizontal = 4
 text = "Continue"
 
-[connection signal="pressed" from="ContinueButton" to="." method="_on_continue_button_pressed"]
+[connection signal="pressed" from="Panel/V/ContinueButton" to="." method="_on_continue_button_pressed"]

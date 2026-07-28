@@ -1,72 +1,127 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemy_ui.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/icons/defend.svg" id="2"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enemy"]
-bg_color = Color(0.16, 0.13, 0.19, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.3, 0.3, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[node name="Enemy" type="Panel"]
-custom_minimum_size = Vector2(200, 250)
-offset_right = 200.0
-offset_bottom = 250.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_enemy")
+[node name="Enemy" type="Control"]
+custom_minimum_size = Vector2(180, 330)
+offset_right = 180.0
+offset_bottom = 330.0
 script = ExtResource("1")
 
 [node name="V" type="VBoxContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 2
+mouse_filter = 2
 
-[node name="IntentLabel" type="Label" parent="V"]
-custom_minimum_size = Vector2(0, 48)
+[node name="IntentBox" type="HBoxContainer" parent="V"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.62, 0.3, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_constants/separation = 4
+alignment = 1
+mouse_filter = 2
+
+[node name="IntentIcon" type="TextureRect" parent="V/IntentBox"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="IntentNum" type="Label" parent="V/IntentBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+vertical_alignment = 1
+text = "12"
+mouse_filter = 2
+
+[node name="IntentName" type="Label" parent="V"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.72, 0.42, 1)
+theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 text = "Intent"
+mouse_filter = 2
+
+[node name="SpriteBox" type="CenterContainer" parent="V"]
+custom_minimum_size = Vector2(0, 214)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Sprite" type="TextureRect" parent="V/SpriteBox"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="V"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
 text = "Enemy"
+mouse_filter = 2
 
-[node name="HPBar" type="ProgressBar" parent="V"]
-custom_minimum_size = Vector2(0, 16)
+[node name="HPRow" type="HBoxContainer" parent="V"]
 layout_mode = 2
+theme_override_constants/separation = 4
+mouse_filter = 2
+
+[node name="BlockBox" type="HBoxContainer" parent="V/HPRow"]
+layout_mode = 2
+theme_override_constants/separation = 0
+mouse_filter = 2
+
+[node name="BlockIcon" type="TextureRect" parent="V/HPRow/BlockBox"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="BlockLabel" type="Label" parent="V/HPRow/BlockBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+vertical_alignment = 1
+text = "0"
+mouse_filter = 2
+
+[node name="HPBar" type="ProgressBar" parent="V/HPRow"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_horizontal = 3
 show_percentage = false
+mouse_filter = 2
 
-[node name="HPLabel" type="Label" parent="V"]
-layout_mode = 2
+[node name="HPLabel" type="Label" parent="V/HPRow/HPBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
+vertical_alignment = 1
 text = "0/0"
-
-[node name="BlockLabel" type="Label" parent="V"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
-horizontal_alignment = 1
-text = "Block: 0"
+mouse_filter = 2
 
 [node name="StatusLabel" type="Label" parent="V"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.85, 0.8, 0.6, 1)
+theme_override_colors/font_color = Color(0.9, 0.82, 0.6, 1)
 theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 autowrap_mode = 3
 text = ""
+mouse_filter = 2

@@ -1,7 +1,8 @@
 extends Node
 ## Autoloaded as "Run". Holds all state that persists across screens for one run.
 
-const MAP_ROWS := 13
+const MAP_ROWS := 14
+const MAX_POTIONS := 3
 
 var rng := RandomNumberGenerator.new()
 
@@ -10,6 +11,7 @@ var hp: int = 80
 var gold: int = 99
 var deck: Array = []      # entries: {"id": String, "up": bool}
 var relics: Array = []    # relic id strings
+var potions: Array = []   # potion id strings, up to MAX_POTIONS
 var map_rows: Array = []  # rows of {"type": String, "visited": bool}
 var current_row: int = -1
 var current_col: int = 0
@@ -36,6 +38,7 @@ func new_run() -> void:
 		deck.append({"id": "defend", "up": false})
 	deck.append({"id": "bash", "up": false})
 	relics = ["burning_blood"]
+	potions = []
 	current_row = -1
 	current_col = 0
 	_generate_map()
@@ -57,13 +60,15 @@ func _roll_type(row: int) -> String:
 	if row == MAP_ROWS - 2:
 		return "rest"
 	var r := rng.randf()
-	if r < 0.46:
+	if r < 0.42:
 		return "monster"
-	if r < 0.60:
+	if r < 0.56:
+		return "event"
+	if r < 0.68:
 		return "elite" if row >= 4 else "monster"
-	if r < 0.74:
+	if r < 0.78:
 		return "rest"
-	if r < 0.87:
+	if r < 0.89:
 		return "shop"
 	return "treasure"
 
@@ -89,6 +94,12 @@ func add_relic(id: String) -> void:
 	if id == "strawberry":
 		max_hp += 7
 		hp += 7
+
+func add_potion(id: String) -> bool:
+	if potions.size() >= MAX_POTIONS:
+		return false
+	potions.append(id)
+	return true
 
 func relic_names() -> String:
 	var names: Array = []
