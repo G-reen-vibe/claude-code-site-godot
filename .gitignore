@@ -1,0 +1,7 @@
+# Godot 4 generated files
+.godot/
+*.translation
+
+# System/editor junk
+*.tmp
+.DS_Store

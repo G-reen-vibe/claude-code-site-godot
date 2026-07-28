@@ -1,0 +1,304 @@
+[gd_scene load_steps=39 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo_controller.gd" id="1_demo"]
+[ext_resource type="Script" path="res://scripts/hd2d_camera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://scripts/lantern_flicker.gd" id="3_flick"]
+[ext_resource type="Shader" path="res://shaders/sprite_hd2d.gdshader" id="4_sprite"]
+[ext_resource type="Shader" path="res://shaders/foliage_hd2d.gdshader" id="5_foliage"]
+[ext_resource type="Shader" path="res://shaders/water_hd2d.gdshader" id="6_water"]
+[ext_resource type="Shader" path="res://shaders/god_rays.gdshader" id="7_rays"]
+[ext_resource type="Shader" path="res://shaders/octopath_post.gdshader" id="8_post"]
+[ext_resource type="Texture2D" path="res://assets/character.svg" id="9_char"]
+[ext_resource type="Texture2D" path="res://assets/tree.svg" id="10_tree"]
+[ext_resource type="Texture2D" path="res://assets/lantern.svg" id="11_lantern"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
+sky_top_color = Color(0.22, 0.34, 0.56, 1)
+sky_horizon_color = Color(0.82, 0.72, 0.58, 1)
+ground_bottom_color = Color(0.15, 0.14, 0.17, 1)
+ground_horizon_color = Color(0.82, 0.72, 0.58, 1)
+sun_angle_max = 40.0
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("SkyMat_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 3
+ambient_light_sky_contribution = 0.6
+tonemap_mode = 3
+tonemap_exposure = 1.05
+ssao_enabled = true
+ssao_intensity = 2.0
+glow_enabled = true
+glow_levels/3 = 1.0
+glow_levels/5 = 1.0
+glow_intensity = 0.7
+glow_strength = 1.0
+glow_bloom = 0.1
+glow_blend_mode = 1
+glow_hdr_threshold = 1.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.012
+volumetric_fog_albedo = Color(0.88, 0.82, 0.7, 1)
+
+[sub_resource type="FastNoiseLite" id="GroundNoise_1"]
+frequency = 0.12
+
+[sub_resource type="NoiseTexture2D" id="GroundNoiseTex_1"]
+seamless = true
+noise = SubResource("GroundNoise_1")
+
+[sub_resource type="StandardMaterial3D" id="GroundMat_1"]
+albedo_color = Color(0.33, 0.47, 0.28, 1)
+albedo_texture = SubResource("GroundNoiseTex_1")
+roughness = 1.0
+uv1_scale = Vector3(10, 10, 1)
+
+[sub_resource type="PlaneMesh" id="GroundMesh_1"]
+material = SubResource("GroundMat_1")
+size = Vector2(40, 40)
+
+[sub_resource type="FastNoiseLite" id="WaterNoise_1"]
+frequency = 0.02
+
+[sub_resource type="NoiseTexture2D" id="WaterNoiseTex_1"]
+seamless = true
+noise = SubResource("WaterNoise_1")
+
+[sub_resource type="ShaderMaterial" id="WaterMat_1"]
+render_priority = 0
+shader = ExtResource("6_water")
+shader_parameter/wave_noise = SubResource("WaterNoiseTex_1")
+
+[sub_resource type="PlaneMesh" id="WaterMesh_1"]
+material = SubResource("WaterMat_1")
+size = Vector2(14, 10)
+subdivide_width = 40
+subdivide_depth = 30
+
+[sub_resource type="ShaderMaterial" id="HeroMat_1"]
+render_priority = 0
+shader = ExtResource("4_sprite")
+shader_parameter/albedo_texture = ExtResource("9_char")
+shader_parameter/rim_strength = 0.45
+
+[sub_resource type="QuadMesh" id="HeroMesh_1"]
+material = SubResource("HeroMat_1")
+size = Vector2(1.2, 1.8)
+
+[sub_resource type="ShaderMaterial" id="TreeMat_1"]
+render_priority = 0
+shader = ExtResource("5_foliage")
+shader_parameter/albedo_texture = ExtResource("10_tree")
+
+[sub_resource type="QuadMesh" id="TreeMesh_1"]
+material = SubResource("TreeMat_1")
+size = Vector2(3.4, 4.2)
+
+[sub_resource type="ShaderMaterial" id="LanternMat_1"]
+render_priority = 0
+shader = ExtResource("4_sprite")
+shader_parameter/albedo_texture = ExtResource("11_lantern")
+shader_parameter/rim_strength = 0.15
+shader_parameter/emission_threshold = 0.6
+shader_parameter/emission_strength = 3.5
+
+[sub_resource type="QuadMesh" id="LanternMesh_1"]
+material = SubResource("LanternMat_1")
+size = Vector2(0.7, 1.6)
+
+[sub_resource type="FastNoiseLite" id="RayNoise_1"]
+frequency = 0.05
+
+[sub_resource type="NoiseTexture2D" id="RayNoiseTex_1"]
+seamless = true
+noise = SubResource("RayNoise_1")
+
+[sub_resource type="ShaderMaterial" id="RayMat_1"]
+render_priority = 0
+shader = ExtResource("7_rays")
+shader_parameter/ray_noise = SubResource("RayNoiseTex_1")
+
+[sub_resource type="QuadMesh" id="RayMesh_1"]
+material = SubResource("RayMat_1")
+size = Vector2(7, 5)
+
+[sub_resource type="StandardMaterial3D" id="StoneMat_1"]
+albedo_color = Color(0.52, 0.52, 0.55, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="StoneMesh_1"]
+material = SubResource("StoneMat_1")
+size = Vector3(0.9, 0.7, 0.9)
+
+[sub_resource type="ParticleProcessMaterial" id="DustProcess_1"]
+emission_shape = 3
+emission_box_extents = Vector3(12, 2.5, 9)
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 0.02
+initial_velocity_max = 0.12
+gravity = Vector3(0, 0.02, 0)
+
+[sub_resource type="StandardMaterial3D" id="DustMat_1"]
+shading_mode = 0
+albedo_color = Color(1, 0.92, 0.75, 1)
+emission_enabled = true
+emission = Color(1, 0.9, 0.7, 1)
+emission_energy_multiplier = 1.8
+
+[sub_resource type="SphereMesh" id="DustMesh_1"]
+material = SubResource("DustMat_1")
+radius = 0.02
+height = 0.04
+radial_segments = 6
+rings = 3
+
+[sub_resource type="ShaderMaterial" id="PostMat_1"]
+render_priority = 0
+shader = ExtResource("8_post")
+
+[node name="OctopathDemo" type="Node3D"]
+script = ExtResource("1_demo")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8192, 0.3838, -0.4263, 0, 0.7431, 0.6691, 0.5736, -0.5481, 0.6088, 0, 12, 0)
+light_color = Color(1, 0.94, 0.82, 1)
+light_energy = 1.4
+shadow_enabled = true
+directional_shadow_max_distance = 60.0
+
+[node name="CameraRig" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 2)
+script = ExtResource("2_cam")
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+transform = Transform3D(1, 0, 0, 0, 0.848, 0.5299, 0, -0.5299, 0.848, 0, 7, 10)
+fov = 50.0
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("GroundMesh_1")
+
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.2, 4)
+cast_shadow = 0
+mesh = SubResource("WaterMesh_1")
+
+[node name="Hero" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 2)
+mesh = SubResource("HeroMesh_1")
+
+[node name="Trees" type="Node3D" parent="."]
+
+[node name="Tree1" type="MeshInstance3D" parent="Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.1, -3)
+mesh = SubResource("TreeMesh_1")
+
+[node name="Tree2" type="MeshInstance3D" parent="Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.1, 2)
+mesh = SubResource("TreeMesh_1")
+
+[node name="Tree3" type="MeshInstance3D" parent="Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 2.1, -7)
+mesh = SubResource("TreeMesh_1")
+
+[node name="Tree4" type="MeshInstance3D" parent="Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 2.1, -6)
+mesh = SubResource("TreeMesh_1")
+
+[node name="Tree5" type="MeshInstance3D" parent="Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.1, -3.5)
+mesh = SubResource("TreeMesh_1")
+
+[node name="Stones" type="Node3D" parent="."]
+
+[node name="Stone1" type="MeshInstance3D" parent="Stones"]
+transform = Transform3D(0.9063, 0, 0.4226, 0, 1, 0, -0.4226, 0, 0.9063, -2.2, 0.3, 4.6)
+mesh = SubResource("StoneMesh_1")
+
+[node name="Stone2" type="MeshInstance3D" parent="Stones"]
+transform = Transform3D(0.9063, 0, 0.4226, 0, 1, 0, -0.4226, 0, 0.9063, -1.5, 0.3, -2.5)
+mesh = SubResource("StoneMesh_1")
+
+[node name="Stone3" type="MeshInstance3D" parent="Stones"]
+transform = Transform3D(0.9063, 0, 0.4226, 0, 1, 0, -0.4226, 0, 0.9063, 7.5, 0.25, 3)
+mesh = SubResource("StoneMesh_1")
+
+[node name="Lantern" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, 0.6)
+
+[node name="LanternSprite" type="MeshInstance3D" parent="Lantern"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+cast_shadow = 0
+mesh = SubResource("LanternMesh_1")
+
+[node name="LanternLight" type="OmniLight3D" parent="Lantern"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0.15)
+light_color = Color(1, 0.8, 0.55, 1)
+light_energy = 2.4
+omni_range = 7.0
+shadow_enabled = true
+script = ExtResource("3_flick")
+
+[node name="GodRays" type="Node3D" parent="."]
+
+[node name="Ray1" type="MeshInstance3D" parent="GodRays"]
+transform = Transform3D(0.7596, 0.3069, -0.5736, -0.3746, 0.9272, 0, 0.5318, 0.2149, 0.8192, -4.8, 3.4, -2.2)
+cast_shadow = 0
+mesh = SubResource("RayMesh_1")
+
+[node name="Ray2" type="MeshInstance3D" parent="GodRays"]
+transform = Transform3D(0.7596, 0.3069, -0.5736, -0.3746, 0.9272, 0, 0.5318, 0.2149, 0.8192, 5.2, 3.6, -4.6)
+cast_shadow = 0
+mesh = SubResource("RayMesh_1")
+
+[node name="Ray3" type="MeshInstance3D" parent="GodRays"]
+transform = Transform3D(0.7596, 0.3069, -0.5736, -0.3746, 0.9272, 0, 0.5318, 0.2149, 0.8192, 10, 3.2, 2)
+cast_shadow = 0
+mesh = SubResource("RayMesh_1")
+
+[node name="Dust" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+amount = 48
+lifetime = 7.0
+preprocess = 5.0
+visibility_aabb = AABB(-14, -3, -11, 28, 8, 22)
+process_material = SubResource("DustProcess_1")
+draw_pass_1 = SubResource("DustMesh_1")
+
+[node name="PostFX" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="PostRect" type="ColorRect" parent="PostFX"]
+unique_name_in_owner = true
+material = SubResource("PostMat_1")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="HelpLabel" type="Label" parent="UI"]
+unique_name_in_owner = true
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 1100.0
+offset_bottom = 140.0
+theme_override_colors/font_color = Color(0.95, 0.93, 0.85, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 15
+text = "OCTOPATH HD-2D SHADER DEMO
+WASD pan · Q/E rotate · right-drag orbit · wheel zoom
+1 tilt-shift DoF · 2 vignette · 3 color grade · 4 grain + aberration · 5 all post FX
+R/F move focus band · H hide help · Esc quit"
